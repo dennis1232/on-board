@@ -52,50 +52,51 @@ export default function Home() {
   };
 
   const renderStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <PersonalInfo
-            ref={personalInfoRef}
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-        );
-      case 2:
-        return (
-          <SelectPlan formData={formData} updateFormData={updateFormData} />
-        );
-      case 3:
-        return <AddOns formData={formData} updateFormData={updateFormData} />;
-      case 4:
-        return <Summary formData={formData} onPlanChange={() => setStep(2)} />;
-      case 5:
-        return <ThankYou />;
-      default:
-        return null;
-    }
+    const commonProps = {
+      formData,
+      updateFormData,
+    };
+
+    const steps = {
+      1: <PersonalInfo ref={personalInfoRef} {...commonProps} />,
+      2: <SelectPlan {...commonProps} />,
+      3: <AddOns {...commonProps} />,
+      4: <Summary formData={formData} onPlanChange={() => setStep(2)} />,
+      5: <ThankYou />,
+    };
+
+    return steps[step as keyof typeof steps] || null;
   };
 
   const isLastStep = step === TOTAL_STEPS;
   const isConfirmStep = step === TOTAL_STEPS - 1;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log("handleSubmit", step);
+
+    e.preventDefault();
+    await nextStep();
+  };
+  console.log("isLastStep", isLastStep);
 
   return (
     <>
       <Sidebar currentStep={step} />
       <main className="flex-1 px-4 md:px-8 py-8 mt-[172px] md:mt-0 xs:bg-magnolia md:bg-white">
         <Card className="max-w-[550px] mx-auto -mt-16 md:mt-0 relative z-20">
-          {renderStep()}
-          {!isLastStep && (
-            <div className="fixed md:static bottom-0 left-0 right-0 bg-white p-4">
-              <StepNavigation
-                showBack={step > 1}
-                onNext={nextStep}
-                onBack={prevStep}
-                nextLabel={isConfirmStep ? "Confirm" : "Next Step"}
-                nextVariant={isConfirmStep ? "secondary" : "primary"}
-              />
-            </div>
-          )}
+          <form onSubmit={handleSubmit}>
+            {renderStep()}
+            {!isLastStep && (
+              <div className="fixed md:static bottom-0 left-0 right-0 bg-white p-4">
+                <StepNavigation
+                  showBack={step > 1}
+                  onBack={prevStep}
+                  nextLabel={isConfirmStep ? "Confirm" : "Next Step"}
+                  nextVariant={isConfirmStep ? "secondary" : "primary"}
+                />
+              </div>
+            )}
+          </form>
         </Card>
       </main>
     </>

@@ -21,7 +21,7 @@ export function PlanCard({
     <div
       onClick={onClick}
       className={`
-        flex flex-row md:flex-col items-start sm:gap-2 p-4 border rounded-lg cursor-pointer
+        flex flex-row md:flex-col items-start xs:gap-2 p-4 border rounded-lg cursor-pointer
         hover:border-purplish-blue transition-colors duration-200
         md:flex-1 md:min-w-[138px]
         ${

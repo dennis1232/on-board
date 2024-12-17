@@ -72,7 +72,6 @@ const PersonalInfo = forwardRef<PersonalInfoRef, PersonalInfoProps>(
       updateFormData({ [name]: value });
       validateField(name, value);
     };
-
     return (
       <Step
         title="Personal info"

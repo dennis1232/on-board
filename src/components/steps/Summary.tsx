@@ -3,6 +3,7 @@ import { Step } from "@/components/ui/Step";
 import { SummaryItem } from "@/components/ui/SummaryItem";
 import { Button } from "../ui/Button";
 import { PLANS_SIMPLE, ADD_ONS_SIMPLE } from "@/config/constants";
+import { Tooltip } from "../ui/Tooltip";
 
 interface SummaryProps {
   formData: FormData;
@@ -29,16 +30,24 @@ export default function Summary({ formData, onPlanChange }: SummaryProps) {
       description="Double-check everything looks OK before confirming."
     >
       <div className="bg-alabaster rounded-lg p-6">
-        <SummaryItem
-          label={`${formData.plan} (${isYearly ? "Yearly" : "Monthly"})`}
-          value={`$${isYearly ? selectedPlan.yearly : selectedPlan.monthly}/${
-            isYearly ? "yr" : "mo"
-          }`}
-          type="primary"
-        />
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-marine-blue text-lg">
+              {`${formData.plan} (${isYearly ? "Yearly" : "Monthly"})`}
+            </span>
+            <Tooltip content="Includes basic gaming features and cloud storage">
+              <span className="text-xs text-cool-gray cursor-help">ⓘ</span>
+            </Tooltip>
+          </div>
+          <span className="font-bold text-marine-blue">
+            ${isYearly ? selectedPlan.yearly : selectedPlan.monthly}/$
+            {isYearly ? "yr" : "mo"}
+          </span>
+        </div>
+
         <Button
           variant="ghost"
-          className="cursor-pointer hover:text-purplish-blue underline text-sm !px-0"
+          className="text-sm text-cool-gray hover:text-purplish-blue underline !px-0"
           onClick={onPlanChange}
         >
           Change
@@ -54,13 +63,23 @@ export default function Summary({ formData, onPlanChange }: SummaryProps) {
                 if (!addon) return null;
 
                 return (
-                  <SummaryItem
+                  <div
                     key={addonId}
-                    label={addon.name}
-                    value={`+$${isYearly ? addon.yearly : addon.monthly}/${
-                      isYearly ? "yr" : "mo"
-                    }`}
-                  />
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-cool-gray">{addon.name}</span>
+                      <Tooltip content={getAddonDescription(addonId)}>
+                        <span className="text-xs text-cool-gray cursor-help">
+                          ⓘ
+                        </span>
+                      </Tooltip>
+                    </div>
+                    <span className="text-marine-blue">
+                      +${isYearly ? addon.yearly : addon.monthly}/$
+                      {isYearly ? "yr" : "mo"}
+                    </span>
+                  </div>
                 );
               })}
             </div>
@@ -68,13 +87,25 @@ export default function Summary({ formData, onPlanChange }: SummaryProps) {
         )}
       </div>
 
-      <div className="p-6">
-        <SummaryItem
-          label={`Total (per ${isYearly ? "year" : "month"})`}
-          value={`$${calculateTotal(formData)}/${isYearly ? "yr" : "mo"}`}
-          type="primary"
-        />
+      <div className="p-6 mt-4 bg-magnolia rounded-lg">
+        <div className="flex items-center justify-between">
+          <span className="text-cool-gray">
+            Total (per {isYearly ? "year" : "month"})
+          </span>
+          <span className="text-xl font-bold text-purplish-blue">
+            ${calculateTotal(formData)}/{isYearly ? "yr" : "mo"}
+          </span>
+        </div>
       </div>
     </Step>
   );
+}
+
+function getAddonDescription(addonId: string): string {
+  const descriptions = {
+    online: "Access multiplayer games and online features",
+    storage: "1TB of cloud storage for game saves and screenshots",
+    profile: "Customize your gaming profile with themes and badges",
+  };
+  return descriptions[addonId as keyof typeof descriptions] || "";
 }
